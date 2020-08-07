@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import DayList from "./DayList";
 import Appointment from "./Appointment";
 import axios from 'axios';
-import { getAppointmentsForDay, getInterview } from '../helpers/selectors';
-
+import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../helpers/selectors';
 import "components/Application.scss";
 
 
@@ -62,7 +61,8 @@ export default function Application(props) {
       <section className="schedule">
         {displayAppts.map((appt) => {
           let int = getInterview(state, appt.interview);
-          return <Appointment key={appt.id}{...appt} interview={int} />
+          let interviewersArray = getInterviewersForDay(state, appt.day);
+          return <Appointment key={appt.id}{...appt} interview={int} interviewers={interviewersArray} />
           })}
         <Appointment id="last" time="1pm" />
       </section>

@@ -14,6 +14,17 @@ export function getAppointmentsForDay(state, day) {
   return appts;
 }
 
+export function getInterviewersForDay(state, day) {
+  let interviewers = [];
+  for (let i of state.days)
+  if (i.name === day) {
+    for (let j of i.interviewers) {
+      interviewers.push(state.interviewers[j])
+    }
+  }
+  return interviewers;
+}
+
 export function getInterview(state, interview) {
   if (!interview) {
     return null;
@@ -41,4 +52,4 @@ export function getInterview(state, interview) {
 }
 
 
-export default {getAppointmentsForDay, getInterview }
+export default {getAppointmentsForDay, getInterview, getInterviewersForDay }
