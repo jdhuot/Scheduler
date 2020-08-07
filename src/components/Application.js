@@ -1,14 +1,13 @@
-import React, { useState, Fragment, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import DayList from "./DayList";
 import Appointment from "./Appointment";
 import axios from 'axios';
-import getAppointmentsForDay from '../helpers/selectors';
+import { getAppointmentsForDay, getInterview } from '../helpers/selectors';
 
 import "components/Application.scss";
 
 
 export default function Application(props) {
-  // const [ day, setDay ] = useState("Monday");
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -17,9 +16,6 @@ export default function Application(props) {
   });
 
   const setDay = day => setState({ ...state, day });
-  const setDays = days => setState(prevDays => ({ ...prevDays, days }));
-  const setAppointments = appointments => setState(prevAppts => ({ ...prevAppts, appointments }));
-  const setInterviewers = interviewers => setState(prevInterviewers => ({ ...prevInterviewers, interviewers }));
 
 
   useEffect(() => {
@@ -30,19 +26,21 @@ export default function Application(props) {
     Promise.all([promiseOne, promiseTwo, promiseThree])
     .then((arrayOfValues) => {
       let [daysData, apptData, interviewersData] = arrayOfValues;
-      console.log('daysData = ' + daysData.data);
-      console.log('apptData = ' + apptData.data);
-      setDays(daysData.data);
-      setAppointments(apptData.data);
-      setInterviewers(interviewersData.data);
+      setState((prev) => {
+        return ({...prev, days: daysData.data,
+        appointments: apptData.data,
+        interviewers: interviewersData.data
+        })
+      })
     })
     .catch((error) => {
       console.log(error);
     })
   }, []);
 
-  let displayAppts = getAppointmentsForDay(state, state.day)
+  const displayAppts = getAppointmentsForDay(state, state.day)
 
+  console.log('displayAppts = ', displayAppts);
   return (
     <main className="layout">
       <section className="sidebar"> 
@@ -62,10 +60,11 @@ export default function Application(props) {
         />
       </section>
       <section className="schedule">
-        <Fragment>
-          {displayAppts.map((appt) => {return <Appointment key={displayAppts.indexOf(appt)}{...appt} />})}
-          <Appointment id="last" time="1pm" />
-        </Fragment>
+        {displayAppts.map((appt) => {
+          let int = getInterview(state, appt.interview);
+          return <Appointment key={appt.id}{...appt} interview={int} />
+          })}
+        <Appointment id="last" time="1pm" />
       </section>
     </main>
   );
