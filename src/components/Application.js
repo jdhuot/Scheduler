@@ -17,7 +17,7 @@ export default function Application(props) {
   const setDay = day => setState({ ...state, day });
 
   function bookInterview(id, interview) {
-    console.log('id = ', id, ' interview = ', interview);
+
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview }
@@ -28,6 +28,13 @@ export default function Application(props) {
     };
     setState({...state, appointments: appointmentsUpdate});
     
+    return axios.put(`/api/appointments/${id}`, {interview} )
+    .then((res) => {
+      return setState({...state, appointments: appointmentsUpdate});
+    })
+    .catch((error) => {
+      console.log(error);
+    })
   };
 
   useEffect(() => {
@@ -73,10 +80,8 @@ export default function Application(props) {
       </section>
       <section className="schedule">
         {displayAppts.map((appt) => {
-          console.log('appt = ', appt);
           let int = getInterview(state, appt.interview);
           let interviewersArray = getInterviewersForDay(state, state.day);
-          {console.log('displayAppts = ', displayAppts)}
           return <Appointment key={appt.id}{...appt} interview={int} interviewers={interviewersArray} bookInterview={bookInterview} />
           })}
         <Appointment id="last" time="1pm" />
