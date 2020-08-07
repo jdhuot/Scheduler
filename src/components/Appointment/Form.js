@@ -18,16 +18,14 @@ export default function Form(props) {
     props.onCancel();
     reset(e);
   }
-  const save = function(e) {
-    props.onSave(name,interviewer);
-  }
+
   return (
     <main className="appointment__card appointment__card--create">
       <section className="appointment__card-left">
         <form autoComplete="off" onSubmit={event => event.preventDefault()}>
           <input
             className="appointment__create-input text--semi-bold"
-            value={name}
+            name={name}
             type="text"
             placeholder={props.name ? props.name : "Enter Student Name"}
             onChange={e => setName(e.target.value)}
@@ -41,7 +39,7 @@ export default function Form(props) {
       <section className="appointment__card-right">
         <section className="appointment__actions">
           <Button danger onClick={e => cancel(e)} >Cancel</Button>
-          <Button confirm onClick={e => save()} >Save</Button>
+          <Button confirm onClick={e => props.onSave(name, interviewer)} >Save</Button>
         </section>
       </section>
     </main>

@@ -16,6 +16,19 @@ export default function Application(props) {
 
   const setDay = day => setState({ ...state, day });
 
+  function bookInterview(id, interview) {
+    console.log('id = ', id, ' interview = ', interview);
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+    const appointmentsUpdate = {
+      ...state.appointments,
+      [id]: appointment
+    };
+    setState({...state, appointments: appointmentsUpdate});
+    
+  };
 
   useEffect(() => {
     const promiseOne = axios.get('/api/days');
@@ -39,7 +52,7 @@ export default function Application(props) {
 
   const displayAppts = getAppointmentsForDay(state, state.day)
 
-  console.log('displayAppts = ', displayAppts);
+  console.log('state.interviewers = ', state.interviewers);
   return (
     <main className="layout">
       <section className="sidebar"> 
@@ -60,9 +73,11 @@ export default function Application(props) {
       </section>
       <section className="schedule">
         {displayAppts.map((appt) => {
+          console.log('appt = ', appt);
           let int = getInterview(state, appt.interview);
-          let interviewersArray = getInterviewersForDay(state, appt.day);
-          return <Appointment key={appt.id}{...appt} interview={int} interviewers={interviewersArray} />
+          let interviewersArray = getInterviewersForDay(state, state.day);
+          {console.log('displayAppts = ', displayAppts)}
+          return <Appointment key={appt.id}{...appt} interview={int} interviewers={interviewersArray} bookInterview={bookInterview} />
           })}
         <Appointment id="last" time="1pm" />
       </section>
