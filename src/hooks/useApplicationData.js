@@ -24,15 +24,6 @@ export function useApplicationData() {
       [id]: appointment
     };
 
-    // const daysCopy = [];
-    // for (let i of state.days) {
-    //   daysCopy.push(i);
-    //   if (i.name === state.day) {
-    //     daysCopy[daysCopy.indexOf(i)].spots -= 1;
-    //   }
-    // }
-    // setState({...state, days: daysCopy});
-
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
       const daysCopy = [];
@@ -43,7 +34,7 @@ export function useApplicationData() {
         }
       }
       setState({...state, days: daysCopy});
-      return setState({...state, appointments: appointments});
+      return setState({...state, appointments});
     })
   };
 
