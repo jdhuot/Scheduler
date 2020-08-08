@@ -22,18 +22,29 @@ export default function Application(props) {
       ...state.appointments[id],
       interview: { ...interview }
     };
-    const appointmentsUpdate = {
+    const appointments = {
       ...state.appointments,
       [id]: appointment
     };
-    setState({...state, appointments: appointmentsUpdate});
     
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
-      return setState({...state, appointments: appointmentsUpdate});
+      return setState({...state, appointments: appointments});
     })
-    .catch((error) => {
-      console.log(error);
+  };
+
+  function cancelInterview(id) {
+    const appointment = {
+      ...state.appointments[id],
+      interview: null
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+    return axios.delete(`/api/appointments/${id}`, {appointment} )
+    .then((res) => {
+      return setState({...state, appointments: appointments});
     })
   };
 
@@ -82,7 +93,7 @@ export default function Application(props) {
         {displayAppts.map((appt) => {
           let int = getInterview(state, appt.interview);
           let interviewersArray = getInterviewersForDay(state, state.day);
-          return <Appointment key={appt.id}{...appt} interview={int} interviewers={interviewersArray} bookInterview={bookInterview} />
+          return <Appointment key={appt.id}{...appt} interview={int} interviewers={interviewersArray} bookInterview={bookInterview} cancelInterview={cancelInterview} />
           })}
         <Appointment id="last" time="1pm" />
       </section>
