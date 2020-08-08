@@ -23,8 +23,26 @@ export function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
+
+    // const daysCopy = [];
+    // for (let i of state.days) {
+    //   daysCopy.push(i);
+    //   if (i.name === state.day) {
+    //     daysCopy[daysCopy.indexOf(i)].spots -= 1;
+    //   }
+    // }
+    // setState({...state, days: daysCopy});
+
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
+      const daysCopy = [];
+      for (let i of state.days) {
+        daysCopy.push(i);
+        if (i.name === state.day) {
+          daysCopy[daysCopy.indexOf(i)].spots -= 1;
+        }
+      }
+      setState({...state, days: daysCopy});
       return setState({...state, appointments: appointments});
     })
   };
@@ -38,8 +56,17 @@ export function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
+
     return axios.delete(`/api/appointments/${id}`, {appointment} )
     .then((res) => {
+      const daysCopy = [];
+      for (let i of state.days) {
+        daysCopy.push(i);
+        if (i.name === state.day) {
+          daysCopy[daysCopy.indexOf(i)].spots += 1;
+        }
+      }
+      setState({...state, days: daysCopy});
       return setState({...state, appointments: appointments});
     })
   };
