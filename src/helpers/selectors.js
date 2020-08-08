@@ -26,7 +26,6 @@ export function getInterviewersForDay(state, day) {
 }
 
 export function getInterview(state, interview) {
-  console.log('selector interview param = ', interview);
   if (interview === null) {
     return null;
   }

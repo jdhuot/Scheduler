@@ -110,7 +110,6 @@ export default function Appointment(props) {
                         onCancel={() => back()} 
                         />
     )}
-    {/* <Appointment id="last" time="1pm" /> */}
     </ Fragment>
   );
 };
