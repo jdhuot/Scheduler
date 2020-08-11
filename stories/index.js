@@ -110,7 +110,7 @@ storiesOf("DayList", module)
       name={interviewer.name}
       selected={interviewer.selected}
       avatar={interviewer.avatar}
-      setInterviewer={event => action("setInterviewer")(interviewer.id)}
+      onChange={event => action("setInterviewer")(interviewer.id)}
       // setInterviewer={action("setInterviewer")}
     />
   ));
@@ -132,7 +132,7 @@ storiesOf("DayList", module)
   .add("Initial", () => (
     <InterviewerList
       interviewers={interviewers}
-      setInterviewer={action("setInterviewer")}
+      onChange={action("setInterviewer")}
     />
   ))
   .add("Preselected", () => (
@@ -173,7 +173,7 @@ storiesOf("DayList", module)
     return(
     <Show 
     student="Lydia Miller-Jones" 
-    interviewer={interviewer}
+    value={interviewer}
     onEdit={action("onEdit")}
     onDelete={action("onDelete")}
     />

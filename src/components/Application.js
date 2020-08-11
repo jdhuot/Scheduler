@@ -21,7 +21,7 @@ export default function Application(props) {
     return (
       <Appointment 
       key={appt.id}
-      {...appt} 
+      {...appt}
       interview={getInterview(state, appt.interview)} 
       interviewers={interviewersArray} 
       bookInterview={bookInterview} 

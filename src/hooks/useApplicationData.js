@@ -11,6 +11,30 @@ export function useApplicationData() {
     interviewers: {}
   });
 
+
+  ///// reducer attempt :(
+
+  // const initialState = {
+  //   day: "Monday",
+  //   days: [],
+  //   appointments: {},
+  //   interviewers: {}
+  // };
+
+  // function reducer(state, action) {
+  //   const { type, payload } = action;
+  //   return { ...state, [type]: payload };
+  // }
+
+  // const setDay = function(day) {
+  //   dispatch({ type: 'day', payload: day });
+  // }
+
+  // const [state, dispatch] = useReducer(reducer, initialState);
+
+  ////
+
+
   const setDay = day => setState({ ...state, day });
 
   function bookInterview(id, interview) {
@@ -34,7 +58,9 @@ export function useApplicationData() {
         }
       }
       setState({...state, days: daysCopy});
+      // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
       return setState({...state, appointments});
+      // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
     })
   };
 
@@ -58,7 +84,9 @@ export function useApplicationData() {
         }
       }
       setState({...state, days: daysCopy});
-      return setState({...state, appointments: appointments});
+      // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
+      return setState({...state, appointments});
+      // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
     })
   };
 
@@ -70,12 +98,18 @@ export function useApplicationData() {
     Promise.all([promiseOne, promiseTwo, promiseThree])
     .then((arrayOfValues) => {
       let [daysData, apptData, interviewersData] = arrayOfValues;
-      setState((prev) => {
+      setState((prev) => { // old way
         return ({...prev, days: daysData.data,
         appointments: apptData.data,
         interviewers: interviewersData.data
         })
       })
+
+      // reducer attempt
+      // dispatch({ type: 'days', payload: daysData.data });
+      // dispatch({ type: 'appointments', payload: apptData.data });
+      // dispatch({ type: 'interviewers', payload: interviewersData.data });
+
     })
     .catch((error) => {
       console.log(error);
