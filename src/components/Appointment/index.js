@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import "./styles.scss";
 import Header from './Header';
 import Show from './Show';
@@ -47,11 +47,21 @@ export default function Appointment(props) {
      .catch(error => transition(ERROR_DELETE, true));
   }
 
+  useEffect(() => { 
+
+    if (mode === 'EMPTY' && props.interview) {
+      transition(SHOW);
+     }
+     if (mode === 'SHOW' && props.interview === null) {
+      transition(EMPTY);
+     }
+  },[props.interview, transition, mode]);
+
   return (
     <Fragment>
     <Header time={props.time} />
     {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
-    {mode === SHOW && (
+    {mode === SHOW && props.interview && (
                         <Show
                           student={props.interview.student}
                           interviewer={props.interview.interviewer}

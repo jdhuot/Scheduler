@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+// const WebSocket = require("ws");
 
 
 export function useApplicationData() {
@@ -10,6 +11,41 @@ export function useApplicationData() {
     appointments: {},
     interviewers: {}
   });
+
+
+
+  useEffect(() => {
+    const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+
+    webSocket.onopen = function() {
+      webSocket.send('ping');
+    };
+
+    webSocket.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      if (data.type === 'SET_INTERVIEW') {
+        setState(state => {
+          const appointment = {
+            ...state.appointments[data.id],
+            interview: data.interview
+          };
+          const appointments = {
+            ...state.appointments,
+            [data.id]: appointment
+          };
+
+          return {...state, appointments};
+        });
+
+        if (data.interview === null) {
+          
+        } 
+      }
+    };
+    return () => {
+      webSocket.close();
+    }
+  },[]);
 
 
   ///// reducer attempt :(
@@ -50,14 +86,18 @@ export function useApplicationData() {
 
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
-      const daysCopy = [];
+      
+      setState((state) => {
+        const daysCopy = [];
       for (let i of state.days) {
         daysCopy.push(i);
         if (i.name === state.day) {
           daysCopy[daysCopy.indexOf(i)].spots -= 1;
         }
       }
-      setState({...state, days: daysCopy});
+        return {...state, days: daysCopy};
+      });
+
       // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
       return setState({...state, appointments});
       // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
@@ -76,14 +116,16 @@ export function useApplicationData() {
 
     return axios.delete(`/api/appointments/${id}`, {appointment} )
     .then((res) => {
-      const daysCopy = [];
+      setState((state) => {
+        const daysCopy = [];
       for (let i of state.days) {
         daysCopy.push(i);
         if (i.name === state.day) {
           daysCopy[daysCopy.indexOf(i)].spots += 1;
         }
       }
-      setState({...state, days: daysCopy});
+        return {...state, days: daysCopy};
+      });
       // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
       return setState({...state, appointments});
       // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
