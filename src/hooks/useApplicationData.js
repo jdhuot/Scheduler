@@ -38,7 +38,30 @@ export function useApplicationData() {
         });
 
         if (data.interview === null) {
-          
+          if (data.type === 'SET_INTERVIEW' && data.interview === null) {
+            setState(state => {
+              const appointment = {
+                ...state.appointments[data.id],
+                interview: data.interview
+              };
+              const appointments = {
+                ...state.appointments,
+                [data.id]: appointment
+              };
+    
+              return {...state, appointments};
+            });
+            setState((state) => {
+              const daysCopy = [];
+            for (let i of state.days) {
+              daysCopy.push(i);
+              if (i.name === state.day) {
+                daysCopy[daysCopy.indexOf(i)].spots += 1;
+              }
+            }
+              return {...state, days: daysCopy};
+            });
+          }
         } 
       }
     };
