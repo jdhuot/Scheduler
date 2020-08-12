@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// const WebSocket = require("ws");
+import { checkPropTypes } from 'prop-types';
 
 
 export function useApplicationData() {
@@ -109,7 +109,6 @@ export function useApplicationData() {
 
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
-      
       setState((state) => {
         const daysCopy = [];
       for (let i of state.days) {
@@ -126,6 +125,28 @@ export function useApplicationData() {
       // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
     })
   };
+
+
+  function editInterview(id, interview) {
+
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+
+    return axios.put(`/api/appointments/${id}`, {interview} )
+    .then((res) => {
+      // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
+      return setState({...state, appointments});
+      // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
+    })
+  };
+
+
 
   function cancelInterview(id) {
     const appointment = {
@@ -187,6 +208,7 @@ export function useApplicationData() {
     state,
     setDay,
     bookInterview,
+    editInterview,
     cancelInterview
   };
 }
