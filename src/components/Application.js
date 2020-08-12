@@ -19,14 +19,16 @@ export default function Application(props) {
 
   const displayAppts = getAppointmentsForDay(state, state.day).map((appt) => {
     return (
-      <Appointment 
-      key={appt.id}
-      {...appt}
-      interview={getInterview(state, appt.interview)} 
-      interviewers={interviewersArray} 
-      bookInterview={bookInterview} 
-      cancelInterview={cancelInterview} 
-      />
+      <article className="appointment" data-testid="appointment" key={appt.id}>
+        <Appointment 
+        key={appt.id}
+        {...appt}
+        interview={getInterview(state, appt.interview)} 
+        interviewers={interviewersArray} 
+        bookInterview={bookInterview} 
+        cancelInterview={cancelInterview} 
+        />
+      </article>
     )
   })
 
