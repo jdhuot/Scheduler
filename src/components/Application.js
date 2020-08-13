@@ -5,9 +5,10 @@ import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../h
 import "components/Application.scss";
 import useApplicationData from '../hooks/useApplicationData';
 
-
+// Application component to display the whole app
 export default function Application(props) {
 
+  // Import application data from the custom hook useApplicationData
   const {
     state,
     setDay,
@@ -16,8 +17,13 @@ export default function Application(props) {
     cancelInterview
   } = useApplicationData();
 
+  // Format interviewers into an array with the helpers/selector function getInterviewersForDay
+  // used as props for appointments
   let interviewersArray = getInterviewersForDay(state, state.day);
 
+  // Format appointments data with the helpers/selector function getAppointmentsForDay
+  // then map to array which displays each appointment as an Appointment component
+  // displayed as the list of appointments when rendered
   const displayAppts = getAppointmentsForDay(state, state.day).map((appt) => {
     return (
       <article className="appointment" data-testid="appointment" key={appt.id}>
@@ -34,6 +40,7 @@ export default function Application(props) {
     )
   })
 
+  // Render the application with the daylist and appointments for the selected day
   return (
     <main className="layout">
       <section className="sidebar"> 

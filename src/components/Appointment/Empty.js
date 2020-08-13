@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Empty component to display empty appointment
 export default function Empty(props) {
   return (
     <main className="appointment__add">
@@ -10,6 +11,6 @@ export default function Empty(props) {
         onClick={props.onAdd}
         data-testid="add-button2"
       />
-</main>
+    </main>
   );
 };

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { checkPropTypes } from 'prop-types';
 
-
+// Custom hook for holding application data logic
 export function useApplicationData() {
 
+  // States for day, days list, appointments, and interviewers
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -12,19 +12,30 @@ export function useApplicationData() {
     interviewers: {}
   });
 
-
-
+  // Create websocket connection to allow multiple clients to have appointments update in realtime
   useEffect(() => {
     const webSocket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
+    // Send initial ping message to ensure connection with scheduler-api server
     webSocket.onopen = function() {
       webSocket.send('ping');
     };
 
+    // Listen on WS for new interview or deleted interview
+    // then update appointment and days states accordingly
     webSocket.onmessage = function (event) {
       const data = JSON.parse(event.data);
       if (data.type === 'SET_INTERVIEW') {
+        // Update spots remaining to subtract one when new interview is booked
         setState(state => {
+          const daysCopy = [];
+          for (let i of state.days) {
+            daysCopy.push(i);
+            if (i.name === state.day) {
+              daysCopy[daysCopy.indexOf(i)].spots -= 1;
+            }
+          }
+          // Update appointments state when new interview is booked
           const appointment = {
             ...state.appointments[data.id],
             interview: data.interview
@@ -33,36 +44,31 @@ export function useApplicationData() {
             ...state.appointments,
             [data.id]: appointment
           };
-
-          return {...state, appointments};
+          return {...state, appointments, days: daysCopy};
         });
 
-        if (data.interview === null) {
-          if (data.type === 'SET_INTERVIEW' && data.interview === null) {
-            setState(state => {
-              const appointment = {
-                ...state.appointments[data.id],
-                interview: data.interview
-              };
-              const appointments = {
-                ...state.appointments,
-                [data.id]: appointment
-              };
-    
-              return {...state, appointments};
-            });
-            setState((state) => {
-              const daysCopy = [];
+        if (data.type === 'SET_INTERVIEW' && data.interview === null) {
+        // Update spots remaining to add one when interview is cancelled
+          setState(state => {
+            const daysCopy = [];
             for (let i of state.days) {
               daysCopy.push(i);
               if (i.name === state.day) {
-                daysCopy[daysCopy.indexOf(i)].spots += 1;
+                daysCopy[daysCopy.indexOf(i)].spots += 2;
               }
             }
-              return {...state, days: daysCopy};
-            });
-          }
-        } 
+            // Update appointments state when interview is cancelled
+            const appointment = {
+              ...state.appointments[data.id],
+              interview: data.interview
+            };
+            const appointments = {
+              ...state.appointments,
+              [data.id]: appointment
+            };
+            return {...state, appointments, days: daysCopy};
+          });
+        }
       }
     };
     return () => {
@@ -70,34 +76,11 @@ export function useApplicationData() {
     }
   },[]);
 
-
-  ///// reducer attempt :(
-
-  // const initialState = {
-  //   day: "Monday",
-  //   days: [],
-  //   appointments: {},
-  //   interviewers: {}
-  // };
-
-  // function reducer(state, action) {
-  //   const { type, payload } = action;
-  //   return { ...state, [type]: payload };
-  // }
-
-  // const setDay = function(day) {
-  //   dispatch({ type: 'day', payload: day });
-  // }
-
-  // const [state, dispatch] = useReducer(reducer, initialState);
-
-  ////
-
-
+  // Save setDay function to update day state
   const setDay = day => setState({ ...state, day });
 
+  // Function to book an interview with axios call to scheduler-api and local state update
   function bookInterview(id, interview) {
-
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview }
@@ -106,27 +89,13 @@ export function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
-      setState((state) => {
-        const daysCopy = [];
-      for (let i of state.days) {
-        daysCopy.push(i);
-        if (i.name === state.day) {
-          daysCopy[daysCopy.indexOf(i)].spots -= 1;
-        }
-      }
-        return {...state, days: daysCopy};
-      });
-
-      // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
       return setState({...state, appointments});
-      // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
     })
   };
 
-
+  // Function to edit an interview with axios call to scheduler-api and local state update
   function editInterview(id, interview) {
 
     const appointment = {
@@ -137,17 +106,13 @@ export function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-
     return axios.put(`/api/appointments/${id}`, {interview} )
     .then((res) => {
-      // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
       return setState({...state, appointments});
-      // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
     })
   };
 
-
-
+  // Function to cancel an interview with axios call to scheduler-api and local state update
   function cancelInterview(id) {
     const appointment = {
       ...state.appointments[id],
@@ -157,25 +122,15 @@ export function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-
     return axios.delete(`/api/appointments/${id}`, {appointment} )
     .then((res) => {
-      setState((state) => {
-        const daysCopy = [];
-      for (let i of state.days) {
-        daysCopy.push(i);
-        if (i.name === state.day) {
-          daysCopy[daysCopy.indexOf(i)].spots += 1;
-        }
-      }
-        return {...state, days: daysCopy};
+      return setState(state => {
+        return {...state, appointments};
       });
-      // dispatch({ type: 'days', payload: daysCopy }); // reducer attempt
-      return setState({...state, appointments});
-      // return dispatch({ type: 'appointments', payload: appointments }); // reducer attempt
     })
   };
 
+  // Initial axios call to scheduler-api server to get data and save to state
   useEffect(() => {
     const promiseOne = axios.get('/api/days');
     const promiseTwo = axios.get('/api/appointments');
@@ -184,26 +139,19 @@ export function useApplicationData() {
     Promise.all([promiseOne, promiseTwo, promiseThree])
     .then((arrayOfValues) => {
       let [daysData, apptData, interviewersData] = arrayOfValues;
-      setState((prev) => { // old way
+      setState((prev) => {
         return ({...prev, days: daysData.data,
         appointments: apptData.data,
         interviewers: interviewersData.data
         })
       })
-
-      // reducer attempt
-      // dispatch({ type: 'days', payload: daysData.data });
-      // dispatch({ type: 'appointments', payload: apptData.data });
-      // dispatch({ type: 'interviewers', payload: interviewersData.data });
-
     })
     .catch((error) => {
       console.log(error);
     })
   }, []);
 
-
-
+  // Export the states and functions to be used from this custom hook
   return {
     state,
     setDay,

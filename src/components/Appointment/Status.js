@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Status component to display when Saving or Deleting, takes in the message as props
 export default function Status(props) {
   return (
     <main className="appointment__card appointment__card--status">

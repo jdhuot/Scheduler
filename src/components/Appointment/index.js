@@ -11,20 +11,24 @@ import useVisualMode from '../../hooks/useVisualMode';
 
 export default function Appointment(props) {
   
+  // Mode values for conditionally displaying the form
   const EMPTY = "EMPTY";
-  const SHOW = "SHOW";
+  const SHOW = "SHOW"; // Appointment is booked
   const CREATE = "CREATE";
   const SAVING = "SAVING";
-  const CONFIRM = "CONFIRM";
+  const CONFIRM = "CONFIRM"; // Confirm delete, or cancel
   const EDIT = "EDIT";
   const ERROR_SAVE = "ERROR_SAVE";
   const ERROR_DELETE = "ERROR_DELETE";
   const DELETING = "DELETING";
 
+  // Bring in mode state, transition and back functions from useVisualMode custom hoook
   const { mode, transition, back } = useVisualMode(
+    // If there's an interview, default to SHOW else EMPTY
     props.interview ? SHOW : EMPTY
   );
 
+  // Save interview after creating or editing an interview
   function save(name, interviewer) {
     const interview = {
       student: name,
@@ -32,12 +36,15 @@ export default function Appointment(props) {
     };
     transition(SAVING);
     
+    // If editing, run editInterview (found useApplicationData custom hook) 
+    // instead of bookInterview which will keep days count the same
     if(mode === 'EDIT') {
       props
       .editInterview(props.id, interview)
       .then(() => transition(SHOW))
       .catch(error => transition(ERROR_SAVE, true));
     } else {
+      // Create interview with bookInterview function (found useApplicationData custom hook)
       props
       .bookInterview(props.id, interview)
       .then(() => transition(SHOW))
@@ -45,7 +52,9 @@ export default function Appointment(props) {
     }
   }
 
+  // Delete the interview by running cancelInterview (found useApplicationData custom hook)
   function deleteInterview(id) {
+
     transition(DELETING, true);
 
     props
@@ -54,6 +63,7 @@ export default function Appointment(props) {
      .catch(error => transition(ERROR_DELETE, true));
   }
 
+  // Conditional to SHOW interview mode if there is an interview, else show EMPTY
   useEffect(() => { 
 
     if (mode === 'EMPTY' && props.interview) {
@@ -64,6 +74,7 @@ export default function Appointment(props) {
      }
   },[props.interview, transition, mode]);
 
+  // Render the various form with appropriate props conditionally based on the current mode state
   return (
     <Fragment>
     <Header time={props.time} />

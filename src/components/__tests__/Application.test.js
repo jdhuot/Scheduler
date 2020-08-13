@@ -38,7 +38,7 @@ describe('Application', () => {
     const mon = getAllByTestId(container, "day").find(day =>
       queryByText(day, "Monday")
     );
-    expect(getByText(mon, /no spots remaining/i)).toBeInTheDocument();
+    expect(getByText(mon, /1 spot remaining/i)).toBeInTheDocument();
   });
 
 
@@ -88,7 +88,7 @@ describe('Application', () => {
     const day = getAllByTestId(container, "day").find(day =>
       queryByText(day, "Monday")
     );
-    expect(getByText(day, /no spots remaining/i)).toBeInTheDocument();
+    expect(getByText(day, /1 spot remaining/i)).toBeInTheDocument();
   });
 
 
