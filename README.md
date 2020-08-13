@@ -39,7 +39,7 @@ npm run cypress
 ## Screenshots
 
 ### Interview Scheduler
-!["Interview Scheduler"]()
+!["Interview Scheduler"](https://github.com/jdhuot/Scheduler/blob/master/docs/Screen%20Shot%202020-08-13%20at%201.52.21%20PM.png?raw=true)
 
 ### Create, Edit, or Remove an Interview
-!["Create, Edit, or Remove an Interview"]()
+!["Create, Edit, or Remove an Interview"](https://github.com/jdhuot/Scheduler/blob/master/docs/Screen%20Shot%202020-08-13%20at%201.52.37%20PM.png?raw=true)
